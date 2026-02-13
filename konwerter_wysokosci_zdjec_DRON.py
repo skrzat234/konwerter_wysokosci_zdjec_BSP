@@ -5,7 +5,7 @@ import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
 # --- Folder ze zdjęciami (oryginalny) ---
-img_folder = r"C:\FIRMA\MATRICE 4E\FOTOGRAMETRIA\test"
+img_folder = r"C:\FIRMA\MATRICE 4E\FOTOGRAMETRIA\test2"
 
 # --- Nowy folder: katalog wyżej + "_converted_H" ---
 parent_folder = os.path.dirname(img_folder)
@@ -25,7 +25,7 @@ for f in os.listdir(img_folder):
 print(f"Skopiowano pliki JPG do: {converted_folder}")
 
 # --- Wczytanie modelu geoidy ---
-geoid_file = r"C:\coding_VSC\11_konwerterWysokosci_elipsodal-NH\Model_quasi-geoidy-PL-geoid2021-PL-EVRF2007-NH.txt"
+geoid_file = r"C:\coding_VSC\11_konwerterWysokosci_elipsodal-NH\model obowiazujacej quasi-geoidy PL-geoid2021 w ukladzie PL-EVRF2007-NH.txt"
 data = np.loadtxt(geoid_file, skiprows=1)
 
 lats_unique = np.unique(data[:,0])
@@ -70,7 +70,7 @@ def read_gps(exif_dict):
 img_files = [f for f in os.listdir(converted_folder) if f.lower().endswith('.jpg')]
 
 # --- Jeden plik wynikowy ---
-txt_output = os.path.join(converted_folder, "metadane_konwersji_wysokosci.txt")
+txt_output = os.path.join(converted_folder, "0_metadane_konwersji_wysokosci.txt")
 
 with open(txt_output, 'w') as f_out:
     f_out.write("filename,latitude,longitude,H_ellipsoidal,H_evrf2007,diff_H\n")
