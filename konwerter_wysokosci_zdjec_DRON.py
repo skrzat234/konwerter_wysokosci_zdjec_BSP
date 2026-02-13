@@ -1,21 +1,37 @@
 import os
+import shutil
 import piexif
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
-# --- Folder ze zdjęciami ---
-img_folder = r"C:\MATRICE 4E\FOTOGRAMETRIA\test"
+# --- Folder ze zdjęciami (oryginalny) ---
+img_folder = r"C:\FIRMA\MATRICE 4E\FOTOGRAMETRIA\test"
+
+# --- Nowy folder: katalog wyżej + "_converted_H" ---
+parent_folder = os.path.dirname(img_folder)
+folder_name = os.path.basename(img_folder)
+converted_folder = os.path.join(parent_folder, f"{folder_name}_converted_H")
+
+# --- Tworzymy folder, jeśli nie istnieje ---
+os.makedirs(converted_folder, exist_ok=True)
+
+# --- Kopiujemy tylko pliki .JPG do nowego folderu ---
+for f in os.listdir(img_folder):
+    if f.lower().endswith(".jpg"):
+        src = os.path.join(img_folder, f)
+        dst = os.path.join(converted_folder, f)
+        shutil.copy2(src, dst)  # copy2 zachowuje metadane pliku
+
+print(f"Skopiowano pliki JPG do: {converted_folder}")
 
 # --- Wczytanie modelu geoidy ---
 geoid_file = r"C:\coding_VSC\11_konwerterWysokosci_elipsodal-NH\Model_quasi-geoidy-PL-geoid2021-PL-EVRF2007-NH.txt"
 data = np.loadtxt(geoid_file, skiprows=1)
 lats_unique = np.unique(data[:,0])
 lons_unique = np.unique(data[:,1])
-
-# zakładamy, że dane są regularną siatką
 zeta_grid = data[:,2].reshape(len(lats_unique), len(lons_unique))
 
-# interpolator RegularGridInterpolator (znacznie szybszy niż griddata)
+# interpolator RegularGridInterpolator (szybki)
 geoid_interp = RegularGridInterpolator((lats_unique, lons_unique), zeta_grid)
 
 # --- Funkcje pomocnicze ---
@@ -42,19 +58,19 @@ def read_gps(exif_dict):
         alt = num / den
     return lat, lon, alt
 
-# --- Lista plików JPG w folderze ---
-img_files = [f for f in os.listdir(img_folder) if f.lower().endswith('.jpg')]
+# --- Lista plików JPG w nowym folderze ---
+img_files = [f for f in os.listdir(converted_folder) if f.lower().endswith('.jpg')]
 
-# --- Pliki tekstowe ---
-txt_original = os.path.join(img_folder, "1_metadane_oryginalne.txt")
-txt_new = os.path.join(img_folder, "2_metadane_evfr2007.txt")
+# --- Pliki tekstowe w nowym folderze ---
+txt_original = os.path.join(converted_folder, "metadane_oryginalne.txt")
+txt_new = os.path.join(converted_folder, "metadane_evfr2007.txt")
 
 with open(txt_original, 'w') as f_orig, open(txt_new, 'w') as f_new:
     f_orig.write("filename,latitude,longitude,alt_ellipsoidal\n")
     f_new.write("filename,latitude,longitude,alt_evrf2007\n")
     
     for img_file in img_files:
-        img_path = os.path.join(img_folder, img_file)
+        img_path = os.path.join(converted_folder, img_file)
         exif_dict = piexif.load(img_path)
         
         # odczyt GPS
@@ -80,4 +96,4 @@ with open(txt_original, 'w') as f_orig, open(txt_new, 'w') as f_new:
         exif_bytes = piexif.dump(exif_dict)
         piexif.insert(exif_bytes, img_path)
 
-print("Gotowe! Wszystkie zdjęcia przeliczone i metadane zapisane.")
+print("Gotowe! Skopiowane zdjęcia przeliczone i metadane zapisane w nowym folderze.")
