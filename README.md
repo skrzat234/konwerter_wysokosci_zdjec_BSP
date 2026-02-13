@@ -1,4 +1,4 @@
-# konwerter_wysokosci_zdjec_DRON
+# konwerter_wysokosci_zdjec_BSP
 Konwersja wysokości zdjęć z elipsoidalnych na EVRF2007-NH oraz aktualizacja metadanych EXIF.
 
 Narzędzie przetwarza folder ze zdjęciami z drona - oblicza wysokości normalne na podstawie modelu geoidy i aktualizuje wysokość w metadanych EXIF - bez ingerencji w piksele zdjęć.
