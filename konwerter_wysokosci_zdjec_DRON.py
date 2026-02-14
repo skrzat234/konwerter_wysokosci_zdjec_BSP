@@ -5,12 +5,12 @@ import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
 # --- Folder ze zdjęciami (oryginalny) ---
-img_folder = r"C:\FIRMA\MATRICE 4E\FOTOGRAMETRIA\test2"
+img_folder = r"C:\FIRMA\MATRICE 4E\FOTOGRAMETRIA\DJI_202510251418_006_dzialka3-2px-h75m"
 
-# --- Nowy folder: katalog wyżej + "_converted_H" ---
+# --- Nowy folder: katalog wyżej + "_EVRF2007" ---
 parent_folder = os.path.dirname(img_folder)
 folder_name = os.path.basename(img_folder)
-converted_folder = os.path.join(parent_folder, f"{folder_name}_converted_H")
+converted_folder = os.path.join(parent_folder, f"{folder_name}_EVRF2007")
 
 # --- Tworzymy folder, jeśli nie istnieje ---
 os.makedirs(converted_folder, exist_ok=True)
@@ -22,7 +22,7 @@ for f in os.listdir(img_folder):
         dst = os.path.join(converted_folder, f)
         shutil.copy2(src, dst)
 
-print(f"Skopiowano pliki JPG do: {converted_folder}")
+print(f"-Skopiowano pliki JPG do: {converted_folder}")
 
 # --- Wczytanie modelu geoidy ---
 geoid_file = r"C:\coding_VSC\11_konwerterWysokosci_elipsodal-NH\model obowiazujacej quasi-geoidy PL-geoid2021 w ukladzie PL-EVRF2007-NH.txt"
@@ -70,7 +70,7 @@ def read_gps(exif_dict):
 img_files = [f for f in os.listdir(converted_folder) if f.lower().endswith('.jpg')]
 
 # --- Jeden plik wynikowy ---
-txt_output = os.path.join(converted_folder, "0_metadane_konwersji_wysokosci.txt")
+txt_output = os.path.join(converted_folder, "0_lista_H_elip_i_H_evrf2007.txt")
 
 with open(txt_output, 'w') as f_out:
     f_out.write("filename,latitude,longitude,H_ellipsoidal,H_evrf2007,diff_H\n")
@@ -97,4 +97,4 @@ with open(txt_output, 'w') as f_out:
         exif_bytes = piexif.dump(exif_dict)
         piexif.insert(exif_bytes, img_path)
 
-print("Gotowe! Jeden plik TXT zapisany + EXIF zaktualizowany.")
+print(f"-Gotowe! Wszystkie wysokości zdjęć przeliczone, EXIF zaktualizowany, a wysokości elipsoidalne i normalne oraz ich różnice - zapisane w pliku tekstowym:\n{txt_output}.")
