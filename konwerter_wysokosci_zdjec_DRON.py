@@ -1,18 +1,18 @@
-import os
+﻿import os
 import shutil
 import piexif
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
-# --- Folder ze zdjęciami (oryginalny) ---
+# --- Folder ze zdjeciami (oryginalny) ---
 img_folder = r"C:\FIRMA\MATRICE 4E\FOTOGRAMETRIA\DJI_202510251418_007_dzialka4-3px-h112m"
 
-# --- Nowy folder: katalog wyżej + "_converted_H" ---
+# --- Nowy folder: katalog wyzej + "_converted_H" ---
 parent_folder = os.path.dirname(img_folder)
 folder_name = os.path.basename(img_folder)
 converted_folder = os.path.join(parent_folder, f"{folder_name}_converted_H")
 
-# --- Tworzymy folder, jeśli nie istnieje ---
+# --- Tworzymy folder, jesli nie istnieje ---
 os.makedirs(converted_folder, exist_ok=True)
 
 # --- Kopiujemy tylko pliki .JPG do nowego folderu ---
@@ -25,40 +25,42 @@ for f in os.listdir(img_folder):
 print(f"-Skopiowano pliki JPG do: {converted_folder}")
 
 # --- Wczytanie modelu geoidy ---
-# można wybrać geoidę dla evrf2007 lub kron86.
+# Mozna wybrac geoide dla evrf2007 lub kron86.
 geoid_file = r"C:\coding_VSC\11_konwerterWysokosci_elipsodal-NH\1_model obowiazujacej quasi-geoidy PL-geoid2021 w ukladzie PL-EVRF2007-NH.txt"
 data = np.loadtxt(geoid_file, skiprows=1)
 
-lats_unique = np.unique(data[:,0])
-lons_unique = np.unique(data[:,1])
-zeta_grid = data[:,2].reshape(len(lats_unique), len(lons_unique))
+lats_unique = np.unique(data[:, 0])
+lons_unique = np.unique(data[:, 1])
+zeta_grid = data[:, 2].reshape(len(lats_unique), len(lons_unique))
 
 geoid_interp = RegularGridInterpolator((lats_unique, lons_unique), zeta_grid)
+
 
 # --- Funkcje pomocnicze ---
 def dms_to_deg(dms, ref):
     deg = dms[0][0] / dms[0][1]
     minutes = dms[1][0] / dms[1][1]
     seconds = dms[2][0] / dms[2][1]
-    dec = deg + minutes/60 + seconds/3600
-    if ref in ['S', 'W']:
+    dec = deg + minutes / 60 + seconds / 3600
+    if ref in ["S", "W"]:
         dec = -dec
     return dec
 
+
 def read_gps(exif_dict):
-    gps_ifd = exif_dict.get('GPS', {})
+    gps_ifd = exif_dict.get("GPS", {})
     lat, lon, alt = None, None, None
 
     if piexif.GPSIFD.GPSLatitude in gps_ifd and piexif.GPSIFD.GPSLatitudeRef in gps_ifd:
         lat = dms_to_deg(
             gps_ifd[piexif.GPSIFD.GPSLatitude],
-            gps_ifd[piexif.GPSIFD.GPSLatitudeRef].decode()
+            gps_ifd[piexif.GPSIFD.GPSLatitudeRef].decode(),
         )
 
     if piexif.GPSIFD.GPSLongitude in gps_ifd and piexif.GPSIFD.GPSLongitudeRef in gps_ifd:
         lon = dms_to_deg(
             gps_ifd[piexif.GPSIFD.GPSLongitude],
-            gps_ifd[piexif.GPSIFD.GPSLongitudeRef].decode()
+            gps_ifd[piexif.GPSIFD.GPSLongitudeRef].decode(),
         )
 
     if piexif.GPSIFD.GPSAltitude in gps_ifd:
@@ -67,13 +69,14 @@ def read_gps(exif_dict):
 
     return lat, lon, alt
 
-# --- Lista zdjęć ---
-img_files = [f for f in os.listdir(converted_folder) if f.lower().endswith('.jpg')]
+
+# --- Lista zdjec ---
+img_files = [f for f in os.listdir(converted_folder) if f.lower().endswith(".jpg")]
 
 # --- Jeden plik wynikowy ---
 txt_output = os.path.join(converted_folder, "0_lista_H_oryg_i_conv.txt")
 
-with open(txt_output, 'w') as f_out:
+with open(txt_output, "w") as f_out:
     f_out.write("filename,latitude,longitude,H_elipsoidalne,H_wynikowe,roznica_H\n")
 
     for img_file in img_files:
@@ -91,11 +94,14 @@ with open(txt_output, 'w') as f_out:
 
         f_out.write(f"{img_file},{lat},{lon},{alt_ell:.3f},{alt_evrf:.3f},{diff_h:.3f}\n")
 
-        gps_ifd = exif_dict.get('GPS', {})
+        gps_ifd = exif_dict.get("GPS", {})
         gps_ifd[piexif.GPSIFD.GPSAltitudeRef] = 0
-        gps_ifd[piexif.GPSIFD.GPSAltitude] = (int(alt_evrf*1000), 1000)
+        gps_ifd[piexif.GPSIFD.GPSAltitude] = (int(alt_evrf * 1000), 1000)
 
         exif_bytes = piexif.dump(exif_dict)
         piexif.insert(exif_bytes, img_path)
 
-print(f"-Gotowe! Wszystkie wysokości zdjęć przeliczone, EXIF zaktualizowany, a wysokości elipsoidalne i normalne oraz ich różnice - zapisane w pliku tekstowym:\n{txt_output}.")
+print(
+    f"-Gotowe! Wszystkie wysokosci zdjec przeliczone, EXIF zaktualizowany, "
+    f"a wysokosci elipsoidalne i normalne oraz ich roznice zapisane w pliku tekstowym:\n{txt_output}."
+)
