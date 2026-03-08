@@ -7,7 +7,7 @@ Skrypt najpierw tworzy nowy folder równoległy (*_converted_H), kopiuje do nieg
 
 ## Funkcje
 
-- Kopiuje wszystkie zdjęcia .JPG z katalogu źródłowego do nowego folderu *_converted_H.<br>
+- Kopiuje wszystkie zdjęcia .JPG z katalogu źródłowego do nowego folderu *_converted_to_*.<br>
 - Odczytuje współrzędne oraz wysokość elipsoidalną z metadanych EXIF<br>
 - Konwertuje wysokości elipsoidalne do EVRF2007-NH lub KRON86 na podstawie modelu geoidy w formacie TXT<br>
 - Zapisuje oryginalne i przeliczone metadane (nazwa zdjęcia, współrzędne poziome, wysokości) do pliku TXT<br>
