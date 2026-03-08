@@ -25,10 +25,14 @@ Skrypt automatycznie odczytuje plik modelu i interpoluje wartości wysokości dl
 Główny Urząd Geodezji i Kartografii (GUGiK)<br>
 Model geoidy EVRF2007 został wykorzystany w formie niezmienionej, a w modelu do uzyskania wysokości KRON86 został dostosowany nagłówek by mieścił się w pierwszym wierszu. 
 
+
 Licencja:
 Creative Commons Uznanie Autorstwa 4.0 (CC BY 4.0)
 https://creativecommons.org/licenses/by/4.0/
 
 Oryginalny plik:
-[Model_quasi-geoidy-PL-geoid2021-PL-EVRF2007-NH]
+[model obowiązującej quasi-geoidy PL-geoid2021 w układzie PL-EVRF2007-NH]
+[model quasi-geoidy PL-geoid2011 w układzie PL-KRON86-NH]
 https://www.gov.pl/web/gugik/modele-danych
+
+Część kodu została wygenerowana z pomocą narzędzi AI.
