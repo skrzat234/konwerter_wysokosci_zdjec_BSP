@@ -135,6 +135,7 @@ class HeightConverterApp:
         self.img_folder_var = tk.StringVar()
         self.geoid_choice_var = tk.StringVar(value=list(DEFAULT_GEOIDS.keys())[0])
         self.geoid_file_var = tk.StringVar(value=DEFAULT_GEOIDS[self.geoid_choice_var.get()])
+        self.geoid_display_var = tk.StringVar(value="")
         self.progress_var = tk.IntVar(value=0)
         self.status_var = tk.StringVar(value="Gotowe do pracy")
 
@@ -166,16 +167,16 @@ class HeightConverterApp:
         self.geoid_combo.grid(row=3, column=0, sticky="ew", padx=(0, 8))
         self.geoid_combo.bind("<<ComboboxSelected>>", self.on_geoid_choice_changed)
 
-        self.preset_btn = ttk.Button(main, text="Uzyj presetu", command=self.apply_geoid_preset)
-        self.preset_btn.grid(row=3, column=1, sticky="w", padx=(0, 8))
-        self.geoid_btn = ttk.Button(main, text="Wybierz plik geoidy", command=self.pick_geoid_file)
-        self.geoid_btn.grid(row=3, column=2, sticky="w")
+        self.geoid_btn = ttk.Button(
+            main, text="Wybierz plik geoidy recznie", command=self.pick_geoid_file
+        )
+        self.geoid_btn.grid(row=3, column=1, sticky="w")
 
-        ttk.Label(main, text="Sciezka pliku geoidy (.txt):").grid(
+        ttk.Label(main, text="Aktualny plik geoidy:").grid(
             row=4, column=0, sticky="w", pady=(10, 4)
         )
-        self.geoid_entry = ttk.Entry(main, textvariable=self.geoid_file_var)
-        self.geoid_entry.grid(row=5, column=0, columnspan=3, sticky="ew", pady=(0, 10))
+        self.geoid_info_label = ttk.Label(main, textvariable=self.geoid_display_var)
+        self.geoid_info_label.grid(row=5, column=0, columnspan=3, sticky="w", pady=(0, 10))
 
         self.start_btn = ttk.Button(main, text="Start", command=self.start_conversion)
         self.start_btn.grid(row=6, column=0, sticky="w", pady=(0, 10))
@@ -203,6 +204,12 @@ class HeightConverterApp:
         preset_path = DEFAULT_GEOIDS.get(chosen)
         if preset_path:
             self.geoid_file_var.set(preset_path)
+            self.update_geoid_display(preset_path, source="preset")
+
+    def update_geoid_display(self, geoid_path, source):
+        label = os.path.basename(geoid_path) if geoid_path else "(brak)"
+        source_txt = "preset" if source == "preset" else "recznie"
+        self.geoid_display_var.set(f"{label} ({source_txt})")
 
     def pick_img_folder(self):
         selected = filedialog.askdirectory(title="Wybierz folder ze zdjeciami")
@@ -216,6 +223,7 @@ class HeightConverterApp:
         )
         if selected:
             self.geoid_file_var.set(selected)
+            self.update_geoid_display(selected, source="manual")
 
     def set_ui_busy(self, busy):
         state = "disabled" if busy else "normal"
@@ -223,8 +231,6 @@ class HeightConverterApp:
         self.img_entry.configure(state=state)
         self.img_btn.configure(state=state)
         self.geoid_combo.configure(state=combo_state)
-        self.preset_btn.configure(state=state)
-        self.geoid_entry.configure(state=state)
         self.geoid_btn.configure(state=state)
         self.start_btn.configure(state=state)
 
