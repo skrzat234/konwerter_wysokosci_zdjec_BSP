@@ -30,7 +30,7 @@ Licencja:<br>
 Creative Commons Uznanie Autorstwa 4.0 (CC BY 4.0)<br>
 https://creativecommons.org/licenses/by/4.0/<br>
 
-Oryginalny plik:<br>
+Oryginalne pliki:<br>
 [model obowiązującej quasi-geoidy PL-geoid2021 w układzie PL-EVRF2007-NH]<br>
 [model quasi-geoidy PL-geoid2011 w układzie PL-KRON86-NH]<br>
 https://www.gov.pl/web/gugik/modele-danych<br>
